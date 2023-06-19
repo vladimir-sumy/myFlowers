@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">myFlowers</string>
+    <string name="return_to_list">Return to List</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="flower_name">Flower Name</string>
+    <string name="description">Description</string>
+    <string name="width">Width</string>
+    <string name="height">Height</string>
+    <string name="count">Count</string>
+    <string name="date_of_purchase">Date of Purchase</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="edit_flower">Edit Flower</string>
+    <string name="add_flower_button">Add Flower</string>
+    <string name="filter_by_name_edittext">Filter by name</string>
+    <string name="my_plants_textview">My Plants</string>
+    <string name="search_flowers_edittext">Search flowers...</string>
+</resources>
