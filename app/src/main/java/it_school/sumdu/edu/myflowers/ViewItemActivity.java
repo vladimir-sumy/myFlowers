@@ -2,12 +2,14 @@ package it_school.sumdu.edu.myflowers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.squareup.picasso.Picasso;
@@ -78,6 +80,12 @@ public class ViewItemActivity extends AppCompatActivity {
     }
 
     private void returnToList() {
+        int position = getIntent().getIntExtra("position", -1);
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("isEdited", true);
+        resultIntent.putExtra("position", position);
+        resultIntent.putExtra("editedFlower", flower);
+        setResult(RESULT_OK, resultIntent);
         finish();
     }
 
@@ -100,16 +108,17 @@ public class ViewItemActivity extends AppCompatActivity {
     }
 
     private void deleteFlower() {
+        int position = getIntent().getIntExtra("position", -1);
         // Delete the flower from the SQLite database
         DbHelper dbHelper = new DbHelper(this);
         dbHelper.deleteFlower(flower.getId());
         Intent resultIntent = new Intent();
+        resultIntent.putExtra("position", position);
         resultIntent.putExtra("deletedFlower", flower);
+        resultIntent.putExtra("isDeleted", true);
         setResult(RESULT_OK, resultIntent);
         finish();
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

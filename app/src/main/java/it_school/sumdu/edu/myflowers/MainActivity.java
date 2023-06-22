@@ -17,7 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ItemAdapter.OnItemClickListener {
+    private static final int VIEW_ITEM_REQUEST = 4;
     private EditText searchEditText;
     private RecyclerView flowerRecyclerView;
     private Button addButton;
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int ADD_ITEM_REQUEST_CODE = 1;
     public static final int VIEW_ITEM_REQUEST_CODE = 2;
+
+    public static final int EDIT_FLOWER_REQUEST = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
         populateFlowerList(); // Populate the flowerList with data from the database
 
         itemAdapter = new ItemAdapter(this, flowerList);
-        flowerRecyclerView.setAdapter(itemAdapter);
         flowerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        flowerRecyclerView.setAdapter(itemAdapter);
+
+
 
         Button searchButton = findViewById(R.id.searchButton);
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -109,13 +114,6 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, ADD_ITEM_REQUEST_CODE);
     }
 
-    private void openViewItemActivity(Flower flower) {
-        Intent intent = new Intent(MainActivity.this, ViewItemActivity.class);
-        intent.putExtra("flower", flower);
-        startActivityForResult(intent, VIEW_ITEM_REQUEST_CODE);
-    }
-
-
     @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -125,19 +123,48 @@ public class MainActivity extends AppCompatActivity {
             Flower newFlower = data.getParcelableExtra("newFlower");
             if (newFlower != null) {
                 flowerList.add(newFlower);
-                itemAdapter.notifyDataSetChanged();
             }
-        } else if (requestCode == VIEW_ITEM_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            Flower deletedFlower = data.getParcelableExtra("deletedFlower");
-            if (deletedFlower != null) {
-                flowerList.remove(deletedFlower);
-                itemAdapter.notifyDataSetChanged();
-                Toast.makeText(this, "Flower deleted", Toast.LENGTH_SHORT).show();
-                itemAdapter.filterList("");
+        } else  if (requestCode == VIEW_ITEM_REQUEST_CODE) {
+            boolean isEdited = data.getBooleanExtra("isEdited", false);
+            boolean isDeleted = data.getBooleanExtra("isDeleted", false);
+
+            if (isEdited) {
+                // Update the flower in the RecyclerView
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    Flower editedFlower = (Flower) data.getParcelableExtra("editedFlower");;
+
+                    flowerList.set(position, editedFlower);
+                    itemAdapter.notifyItemChanged(position);
+                }
+            }
+
+            if (isDeleted) {
+                Toast.makeText(MainActivity.this, "Flower deleted successfully", Toast.LENGTH_SHORT).show();
+                // Remove the flower from the RecyclerView
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    flowerList.remove(position);
+                    itemAdapter.notifyItemRemoved(position);
+                }
             }
         }
         itemAdapter.filterList("");
+    }
 
+    @Override
+    public void onItemClick(int position) {
+        Intent intent = new Intent(MainActivity.this, ViewItemActivity.class);
+        intent.putExtra("flower", flowerList.get(position));
+        intent.putExtra("position", position);
+        startActivityForResult(intent, EDIT_FLOWER_REQUEST);
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        flowerList.remove(position);
+        itemAdapter.notifyDataSetChanged();
+        Toast.makeText(this, "Flower deleted successfully", Toast.LENGTH_SHORT).show();
     }
 
 }

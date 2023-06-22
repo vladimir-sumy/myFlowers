@@ -62,6 +62,25 @@ public class DbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void updateFlower(Flower flower) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, flower.getName());
+        values.put(COLUMN_DESCRIPTION, flower.getDescription());
+        values.put(COLUMN_IMAGE, flower.getImage());
+        values.put(COLUMN_WIDTH, flower.getWidth());
+        values.put(COLUMN_HEIGHT, flower.getHeight());
+        values.put(COLUMN_COUNT, flower.getCount());
+        values.put(COLUMN_DATE_OF_PURCHASE, flower.getDateOfPurchase());
+        // Set other columns and values for updating
+
+        String whereClause = "id = ?";
+        String[] whereArgs = {String.valueOf(flower.getId())};
+
+        db.update("flowers", values, whereClause, whereArgs);
+        db.close();
+    }
 
     public List<Flower> getAllFlowers() {
         List<Flower> flowerList = new ArrayList<>();

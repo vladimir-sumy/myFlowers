@@ -27,11 +27,15 @@ public class EditItemActivity extends AppCompatActivity {
     private Button uploadPhotoButton;
     private Button saveButton;
     private Button cancelButton;
+    private DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
+
+        // Initialize views and variables
+        dbHelper = new DbHelper(this);
 
         // Retrieve the flower object from the intent
         Intent intent = getIntent();
@@ -114,9 +118,15 @@ public class EditItemActivity extends AppCompatActivity {
         flower.setCount(count);
         flower.setDateOfPurchase(purchaseDate);
 
+        // Save the edited flower to the database
+        dbHelper.updateFlower(flower);
+
+        Toast.makeText(EditItemActivity.this, "Flower edited successfully", Toast.LENGTH_SHORT).show();
+
         // Return the updated flower object back to the calling activity
         Intent resultIntent = new Intent();
         resultIntent.putExtra("updatedFlower", flower);
+        resultIntent.putExtra("isEdited", true);
         setResult(RESULT_OK, resultIntent);
         finish();
     }

@@ -19,6 +19,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     private Context context;
     private List<Flower> flowerList;
     private List<Flower> filteredList;
+    private OnItemClickListener listener;
 
     public ItemAdapter(Context context, List<Flower> flowerList) {
         this.context = context;
@@ -31,6 +32,15 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         this.filteredList = new ArrayList<>(flowerList);
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+        void onDeleteClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,23 +51,30 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Flower flower = filteredList.get(position);
-        holder.flowerNameTextView.setText(flower.getName());
+        if (flower != null) {
+            holder.flowerNameTextView.setText(flower.getName());
 
-        // Set flower image using an image loading library or custom logic
-         holder.flowerImageView.setImageURI(flower.getImageUri());
+            // Set flower image using an image loading library or custom logic
+            holder.flowerImageView.setImageURI(flower.getImageUri());
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onItemClick(position);
+                    }
+                    // Handle item click, navigate to flower details activity
+                    openFlowerDetailsActivity(flower, position);
+                }
+            });
+        }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle item click, navigate to flower details activity
-                openFlowerDetailsActivity(flower);
-            }
-        });
     }
 
-    private void openFlowerDetailsActivity(Flower flower) {
+    private void openFlowerDetailsActivity(Flower flower, int position) {
         Intent intent = new Intent(context, ViewItemActivity.class);
         intent.putExtra("flower", flower);
+        intent.putExtra("position", position);
+
         ((Activity) context).startActivityForResult(intent, MainActivity.VIEW_ITEM_REQUEST_CODE);
     }
 
